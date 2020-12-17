@@ -15,7 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import include 
+
+#using include('blog.urls') to tell django that whenever blog/ is used,django will then refer to the blog.urls of
+# the blog app. 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('Blog.urls')),
 ]
