@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.urls import include 
 from users import views as users_view
+from django.contrib.auth.views import LoginView
 
 #using include('blog.urls') to tell django that whenever blog/ is used,django will then refer to the blog.urls of
 # the blog app. 
@@ -24,5 +25,6 @@ from users import views as users_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', users_view.register, name='register'),
+    path('login/', LoginView.as_view(template_name='users/login.html'), name='login'),
     path('', include('Blog.urls')),
 ]
