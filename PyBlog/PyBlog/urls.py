@@ -16,11 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include 
+from users import views as users_view
 
 #using include('blog.urls') to tell django that whenever blog/ is used,django will then refer to the blog.urls of
 # the blog app. 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('register/', users_view.register, name='register'),
     path('', include('Blog.urls')),
 ]
