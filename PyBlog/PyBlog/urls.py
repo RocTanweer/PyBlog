@@ -13,10 +13,13 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path
 from django.urls import include 
 from users import views as users_view
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth.views import LoginView,LogoutView
 
 #using include('blog.urls') to tell django that whenever blog/ is used,django will then refer to the blog.urls of
@@ -27,5 +30,12 @@ urlpatterns = [
     path('register/', users_view.register, name='register'),
     path('login/', LoginView.as_view(template_name='users/login.html'), name='login'),
     path('logout/', LogoutView.as_view(template_name='users/logout.html'), name='logout'),
+    path('profile/', users_view.profile, name='profile'),
     path('', include('Blog.urls')),
 ]
+
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

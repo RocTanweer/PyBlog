@@ -8,6 +8,7 @@ from django.contrib import messages
 
 
 
+
 def register(request):
     #If there is a post request from registration form---------
     if request.method == 'POST':
@@ -35,3 +36,11 @@ def register(request):
         form = UserRegisterForm()
     
     return render(request, 'users/register.html', {'form' : form})
+
+
+
+
+
+
+def profile(request):
+    return render(request, 'users/profile.html')
