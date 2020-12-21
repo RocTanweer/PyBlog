@@ -3,8 +3,11 @@ from django.shortcuts import redirect, render
 # from django.contrib.auth.forms import UserCreationForm
 #Now importing forms.py that I created by inheriting UserCreationFrom and using django.forms
 #to add an extra Email field in registration form
-from .forms import UserRegisterForm
+from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+
 
 
 
@@ -27,7 +30,7 @@ def register(request):
             #redirecting after creating the user to blog-home.
             #if not do so, Account will be created and we will also get respective information but 
             #we will be redirected to the same registration page with our registered data filled!
-            return redirect('blog-home')
+            return redirect('login')
 
     #If there is a get request!
     else:
@@ -41,6 +44,26 @@ def register(request):
 
 
 
-
+@login_required
 def profile(request):
-    return render(request, 'users/profile.html')
+    if request.method == 'POST':
+        #request.POST gives the modelform with the post data filled in
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST,request.FILES,instance=request.user.profile)
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('profile')
+
+    else:
+        #request.user gives the current logged in user
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+
+    
+    context = {
+        'u_form' : u_form,
+        'p_form' : p_form
+    }
+    return render(request, 'users/profile.html', context)
