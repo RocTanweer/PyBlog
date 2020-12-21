@@ -2,6 +2,7 @@ from django.http import request
 from django.shortcuts import render 
 from .models import Post
 from django.contrib.auth.models import User
+from django.views.generic import ListView, DetailView
 # from django.http import HttpResponse
 # I am going to use render rather than HttpResponse now!
 
@@ -46,6 +47,31 @@ def home(requests):
         'posts' : Post.objects.all()
     }
     return render(requests, 'Blog/home.html', context)
+
+
+
+#for iteration, it's 'object_list' by default
+#for just using model's object, it's 'object' by default
+#for context_object_name
+class PostListView(ListView):
+    #specifying the model whose objects are listed in listView
+    model = Post
+    #default context_object_name is 'object_list'
+    context_object_name = 'posts'
+    #default is 'app/model_list.html'
+    template_name = 'Blog/home.html'
+
+
+class PostDetailView(DetailView):
+    #specifying the model whose object are showed in detail view
+    model = Post
+    #here 
+    #template name is default,Blog/post_detail.html
+    #and
+    #object_context_name is also default to object 
+    
+
+
 
 
 def about(requests):
