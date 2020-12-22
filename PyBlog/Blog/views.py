@@ -2,7 +2,8 @@ from django.http import request
 from django.shortcuts import render 
 from .models import Post
 from django.contrib.auth.models import User
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 # from django.http import HttpResponse
 # I am going to use render rather than HttpResponse now!
 
@@ -69,7 +70,57 @@ class PostDetailView(DetailView):
     #template name is default,Blog/post_detail.html
     #and
     #object_context_name is also default to object 
+
+
+#LoginRequiredMixin is just like the decorator we used for profile view function
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'Blog/post_create.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+
+   
+#LoginRequiredMixin is just like the decorator we used for profile view function
+"""
+Reason for using UserPassesTestMixin even though we have used LoginRequiredMixin:
+If you are logged out of your blog account and try to write the url for like deleting a post, you will certainly get
+redirected to login page.But the downfall is that if you are writing a url to delete/update a post that belongs 
+to someone else, You will still be able to do so(which is obviously absurd).That is why we used UserPassesTestMixin.
+Now if you try to delete/update a post of someone else, you will get redirected to login page first,but if you do not
+enter the credentials of that user,it will throw a '403 Forbidden'
+"""
+class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin ,UpdateView):
+    model = Post
+    fields = ['title', 'content']
+    template_name = 'Blog/post_update.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
     
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
+
+#LoginRequiredMixin is just like the decorator we used for profile view function
+class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin ,DeleteView):
+    model = Post    
+    success_url = '/'
+    template_name = 'Blog/post_delete.html'
+
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
 
 
 
