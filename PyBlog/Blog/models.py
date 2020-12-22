@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 #Creating a class by inheriting Model class in models
 #This is the structure of a table in the database in the form of a class
@@ -20,4 +21,8 @@ class Post(models.Model):
     #We will make str of this class,so when an object of post model is printed,django will show their title.
     def __str__(self):
         return f'Title is {self.title}'
+
+
+    def get_absolute_url(self):
+        return reverse('post-detail', kwargs={ 'pk' : self.pk })
 
