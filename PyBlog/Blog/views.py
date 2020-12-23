@@ -1,9 +1,10 @@
 from django.http import request
-from django.shortcuts import render 
+from django.shortcuts import render, get_object_or_404
 from .models import Post
 from django.contrib.auth.models import User
 from django.views.generic import ListView, DetailView, CreateView, DeleteView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib import messages
 # from django.http import HttpResponse
 # I am going to use render rather than HttpResponse now!
 
@@ -61,6 +62,24 @@ class PostListView(ListView):
     context_object_name = 'posts'
     #default is 'app/model_list.html'
     template_name = 'Blog/home.html'
+    paginate_by = 10
+    ordering = ['-date_posted']
+
+class UserPostListView(ListView):
+    #specifying the model whose objects are listed in listView
+    model = Post
+    #default context_object_name is 'object_list'
+    context_object_name = 'posts'
+    #default is 'app/model_list.html'
+    template_name = 'Blog/user_posts.html'
+    paginate_by = 5
+    ordering = ['-date_posted']
+
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return Post.objects.filter(author=user)
+
 
 
 class PostDetailView(DetailView):
@@ -80,6 +99,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        messages.info(self.request, f'Your post "{form.instance.title}" has been posted successfully!')
         return super().form_valid(form)
 
 
@@ -100,6 +120,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin ,UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
+        messages.info(self.request, f'Your post "{form.instance.title}" has been updated successfully!')
         return super().form_valid(form)
 
     
